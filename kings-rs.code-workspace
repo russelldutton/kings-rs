@@ -1,0 +1,15 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		"rust-analyzer.linkedProjects": [
+			"./api/Cargo.toml"
+		],
+		"rust-analyzer.showUnlinkedFileNotification": false,
+		"sqltools.connections": [],
+		"sqltools.useNodeRuntime": true
+	}
+}
