@@ -1,13 +1,16 @@
-use migrations::tables::create_tables;
+use axum::{response::Html, routing::get, Router};
+use data::migrations::create_tables;
 use sqlx::{migrate::MigrateDatabase, Sqlite};
 
-mod migrations;
+mod core;
+mod data;
 mod models;
+mod web;
 
 const DB_URL: &str = "sqlite://kings.db";
 
 #[tokio::main]
-async fn main() -> Result<(), sqlx::Error> {
+async fn main() {
     if !Sqlite::database_exists(DB_URL).await.unwrap_or(false) {
         println!("Creating KINGS DB {}", DB_URL);
         match Sqlite::create_database(DB_URL).await {
@@ -18,9 +21,22 @@ async fn main() -> Result<(), sqlx::Error> {
         println!("DB already exists.");
     }
 
-    create_tables(DB_URL).await?;
+    create_tables(DB_URL).await.unwrap();
 
     println!("Migrations completed successfully");
 
-    Ok(())
+    let app = Router::new()
+        .route("/", get(handler))
+        .merge(web::player::player_routes());
+
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
+
+    tracing::debug!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+async fn handler() -> Html<&'static str> {
+    Html("<h1>Hello World!</h1>")
 }
