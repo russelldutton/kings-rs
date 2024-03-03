@@ -43,9 +43,7 @@ async fn create_players_table(db_url: &str) -> Result<(), sqlx::Error> {
       nickname    TEXT  NOT NULL,
       role        TEXT  NULL,
       game_id     TEXT,
-      round_id    TEXT,
-      FOREIGN KEY(game_id) REFERENCES games(game_id),
-      FOREIGN KEY(round_id) REFERENCES rounds(round_id)
+      FOREIGN KEY(game_id) REFERENCES games(game_id)
     );";
 
     sqlx::query(&query_str).execute(&connection).await?;
@@ -61,7 +59,7 @@ async fn create_games_table(db_url: &str) -> Result<(), sqlx::Error> {
     let query_str = "CREATE TABLE IF NOT EXISTS games
     (
       id            TEXT    PRIMARY KEY  NOT NULL,
-      session_code  TEXT    NOT NULL,
+      session_code  TEXT    UNIQUE       NOT NULL,
       player_host   TEXT    NOT NULL,
       is_started    BOOLEAN NOT NULL
     );";
