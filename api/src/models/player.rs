@@ -1,7 +1,8 @@
-use super::{game::Game, role::Role};
+use super::{card::Card, game::Game, role::Role};
 
 pub struct Player {
+    pub id: String,
     pub nickname: String,
     pub role: Role,
-    pub game: Game,
+    pub hand: Vec<Card>,
 }
