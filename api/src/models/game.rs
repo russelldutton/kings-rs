@@ -2,7 +2,7 @@ use super::{card::Card, player::Player, round::Round};
 
 pub struct Game {
     pub session_code: String,
-    pub host: String,
+    pub host: String, // player id
     pub is_started: bool,
     pub rounds: Vec<Round>,
     pub deck: Vec<Card>,
