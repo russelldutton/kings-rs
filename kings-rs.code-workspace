@@ -10,6 +10,7 @@
 		],
 		"rust-analyzer.showUnlinkedFileNotification": false,
 		"sqltools.connections": [],
-		"sqltools.useNodeRuntime": true
+		"sqltools.useNodeRuntime": true,
+		"CodeGPT.apiKey": "Ollama"
 	}
 }

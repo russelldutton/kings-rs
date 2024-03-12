@@ -11,14 +11,15 @@ const DB_URL: &str = "sqlite://kings.db";
 
 #[tokio::main]
 async fn main() {
-    if !Sqlite::database_exists(DB_URL).await.unwrap_or(false) {
+    if Sqlite::database_exists(DB_URL).await.unwrap_or(false) {
+        println!("DB already exists. Dropping DB to run migrations");
+        Sqlite::drop_database(DB_URL);
         println!("Creating KINGS DB {}", DB_URL);
-        match Sqlite::create_database(DB_URL).await {
-            Ok(_) => println!("Creation successful!"),
-            Err(error) => panic!("Error: {}", error),
-        }
-    } else {
-        println!("DB already exists.");
+    }
+
+    match Sqlite::create_database(DB_URL).await {
+        Ok(_) => println!("Creation successful!"),
+        Err(error) => panic!("Error: {}", error),
     }
 
     create_tables(DB_URL).await.unwrap();

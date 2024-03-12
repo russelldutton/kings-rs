@@ -42,7 +42,7 @@ async fn create_players_table(db_url: &str) -> Result<(), sqlx::Error> {
       id          TEXT  PRIMARY KEY  NOT NULL,
       nickname    TEXT  NOT NULL,
       role        TEXT  NULL,
-      game_id     TEXT,
+      game_id     TEXT  NULL,
       FOREIGN KEY(game_id) REFERENCES games(game_id)
     );";
 
