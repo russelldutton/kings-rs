@@ -1,0 +1,3 @@
+@nick_name = Russell Dutton
+
+GET http://localhost:3000/user/register/{{nick_name}}
