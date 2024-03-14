@@ -1,9 +1,9 @@
 use axum::Json;
 use sqlx::SqlitePool;
 
-use crate::models::user::User;
+use crate::entities::user::User;
 
-pub async fn join_lobby(db_url: &str, nick_name: String) -> Result<Json<User>, sqlx::Error> {
+pub async fn register_user(db_url: &str, nick_name: String) -> Result<Json<User>, sqlx::Error> {
     tracing::info!("New player with nick_name {}", nick_name);
 
     let connection = SqlitePool::connect(db_url).await?;

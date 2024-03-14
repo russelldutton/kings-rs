@@ -1,24 +1,29 @@
 {
-	"folders": [
-		{
-			"path": "."
-		},
-		{
-			"path": "api",
-			"name": "api"
-		},
-		{
-			"name": "web",
-			"path": "web"
-		}
-	],
-	"settings": {
-		"rust-analyzer.linkedProjects": [
-			"./api/Cargo.toml"
-		],
-		"rust-analyzer.showUnlinkedFileNotification": false,
-		"sqltools.connections": [],
-		"sqltools.useNodeRuntime": true,
-		"CodeGPT.apiKey": "Ollama"
-	}
+  "folders": [
+    {
+      "path": "."
+    },
+    {
+      "path": "api",
+      "name": "api"
+    },
+    {
+      "name": "web",
+      "path": "web"
+    }
+  ],
+  "settings": {
+    "rust-analyzer.linkedProjects": ["./api/Cargo.toml"],
+    "rust-analyzer.showUnlinkedFileNotification": false,
+    "sqltools.connections": [
+      {
+        "previewLimit": 50,
+        "driver": "SQLite",
+        "name": "Kings",
+        "database": "./api/kings.db"
+      }
+    ],
+    "sqltools.useNodeRuntime": true,
+    "CodeGPT.apiKey": "Ollama"
+  }
 }
