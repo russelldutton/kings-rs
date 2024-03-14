@@ -1,0 +1,14 @@
+-- Add down migration script here
+DROP TABLE IF EXISTS swaps;
+
+DROP TABLE IF EXISTS cards;
+
+DROP TABLE IF EXISTS turns;
+
+DROP TABLE IF EXISTS players;
+
+DROP TABLE IF EXISTS rounds;
+
+DROP TABLE IF EXISTS games;
+
+DROP TABLE IF EXISTS users;
