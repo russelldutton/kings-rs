@@ -1,0 +1,3 @@
+@nick_name = Russ
+
+GET http://localhost:3000/lobby/join/{{nick_name}}
