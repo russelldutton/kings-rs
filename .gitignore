@@ -1,3 +1,4 @@
 **/target
 
 kings.db*
+.env

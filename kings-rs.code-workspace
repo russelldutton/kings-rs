@@ -2,6 +2,14 @@
 	"folders": [
 		{
 			"path": "."
+		},
+		{
+			"path": "api",
+			"name": "api"
+		},
+		{
+			"name": "web",
+			"path": "web"
 		}
 	],
 	"settings": {

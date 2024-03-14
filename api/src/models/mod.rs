@@ -5,3 +5,4 @@ pub mod rank;
 pub mod role;
 pub mod round;
 pub mod suit;
+pub mod user;
