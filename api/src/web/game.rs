@@ -17,23 +17,23 @@ async fn create_game_lobby_handler(
 ) -> Result<Json<PlayerModel>, String> {
     let user_id: i64 = session.get(USER_ID_KEY).await.unwrap().unwrap();
 
-    let player_result = create_player(&state.db_url, user_id).await;
-
-    if let Err(err) = player_result {
-        return Err(err.to_string());
-    }
-
-    let player = player_result.unwrap();
-
     let session_code = generate_random_code();
 
-    let game_result = create_game_lobby(&state.db_url, player.id, session_code).await;
+    let game_result = create_game_lobby(&state.db_url, user_id, session_code).await;
 
     if let Err(err) = game_result {
         return Err(err.to_string());
     }
 
     let game = game_result.unwrap();
+
+    let player_result = create_player(&state.db_url, user_id, game.id).await;
+
+    if let Err(err) = player_result {
+        return Err(err.to_string());
+    }
+
+    let player = player_result.unwrap();
 
     Ok(Json(PlayerModel {
         id: player.id,

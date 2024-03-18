@@ -6,9 +6,9 @@ CREATE TABLE IF NOT EXISTS games
 (
     id            INTEGER PRIMARY KEY,
     session_code  TEXT    UNIQUE     NOT NULL,
-    player_host   INTEGER NOT NULL,
+    host          INTEGER NOT NULL,
     status        TEXT    NOT NULL,
-    FOREIGN KEY(player_host) REFERENCES players(id)
+    FOREIGN KEY(host) REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS users

@@ -4,7 +4,7 @@ use serde::Serialize;
 pub struct Game {
     pub id: i64,
     pub session_code: String,
-    pub player_host: i64,
+    pub host: i64,
     pub status: GameStatus
 }
 
