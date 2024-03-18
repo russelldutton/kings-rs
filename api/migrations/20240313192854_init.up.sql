@@ -6,8 +6,9 @@ CREATE TABLE IF NOT EXISTS games
 (
     id            INTEGER PRIMARY KEY,
     session_code  TEXT    UNIQUE     NOT NULL,
-    player_host   TEXT    NOT NULL,
-    is_started    BOOLEAN NOT NULL
+    player_host   INTEGER NOT NULL,
+    status        TEXT    NOT NULL,
+    FOREIGN KEY(player_host) REFERENCES players(id)
 );
 
 CREATE TABLE IF NOT EXISTS users

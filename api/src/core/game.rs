@@ -1,33 +1,43 @@
-use axum::Json;
 use sqlx::SqlitePool;
 
-use crate::entities::{ player::Player, role::Role };
+use crate::entities::{game::{Game, GameStatus}, player::Player, role::Role};
 
-pub async fn create_game_lobby_and_player(
-    db_url: &str,
-    user_id: i64
-) -> Result<Json<Player>, sqlx::Error> {
-    // tracing::info!("New player with nick_name {}", nick_name);
+pub async fn create_game_lobby(db_url: &str, player_id: i64, session_code: String) -> Result<Game, sqlx::Error> {
+    tracing::info!("Creating new game with player id {} as host", player_id);
 
-    // let connection = SqlitePool::connect(db_url).await?;
+    let connection = SqlitePool::connect(db_url).await?;
 
-    // let new_user: User = sqlx
-    //     ::query_as(
-    //         User,
-    //         "INSERT INTO users (nick_name) VALUES (?) RETURNING id, nick_name",
-    //         nick_name
-    //     )
-    //     .fetch_one(&connection).await?;
+    let new_game = sqlx::query_as!(
+            Game,
+            r#"
+            INSERT INTO games (session_code, player_host, status)
+            VALUES (?, ?, ?)
+            RETURNING id, session_code, player_host, status AS `status: GameStatus`
+            "#,
+            session_code,
+            player_id,
+            GameStatus::Setup
+        )
+        .fetch_one(&connection).await?;
 
-    // tracing::info!("Created new player: {}", new_user);
-    // Ok(Json(new_user))
+    tracing::info!("Created new game: {:?}", new_game);
+    Ok(new_game)
+}
 
-    Ok(
-        Json(Player {
-            id: user_id,
-            game_id: Some(1),
-            nick_name: "Russ".to_string(),
-            role: Some(Role::Commoner),
-        })
+pub async fn create_player(db_url: &str, user_id: i64) -> Result<Player, sqlx::Error> {
+    tracing::info!("Looking for players with user_id: {}", user_id);
+
+    let connection = SqlitePool::connect(db_url).await?;
+
+    let player = sqlx::query_as!(
+        Player,
+        r#"
+        INSERT INTO players (user_id) VALUES (?) RETURNING id, user_id, role AS `role?: Role`, game_id
+        "#,
+        user_id
     )
+    .fetch_one(&connection)
+    .await?;
+
+    Ok(player)
 }

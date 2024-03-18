@@ -1,28 +1,35 @@
+use axum::{response::Html, routing::get, Router};
+use chrono::prelude::*;
 use std::sync::Arc;
 use tower::ServiceBuilder;
-use axum::{ response::Html, routing::get, Router };
-use tower_http::{ compression::CompressionLayer, cors::{ Any, CorsLayer }, trace::TraceLayer };
-use tower_sessions::{ Expiry, MemoryStore, SessionManagerLayer };
-use chrono::prelude::*;
+use tower_http::{
+    compression::CompressionLayer,
+    cors::{Any, CorsLayer},
+    trace::TraceLayer,
+};
+use tower_sessions::{MemoryStore, SessionManagerLayer};
 
 use crate::common::app_state::AppState;
 
+mod common;
 mod core;
 mod entities;
 mod web;
-mod common;
+mod util;
+mod models;
 
 const DB_URL: &str = "sqlite://kings.db";
 pub const USER_ID_KEY: &str = "user_id";
 
 #[tokio::main]
 async fn main() {
-    let state = Arc::new(AppState { db_url: DB_URL.to_string() });
+    let state = Arc::new(AppState {
+        db_url: DB_URL.to_string(),
+    });
 
     let session_store = MemoryStore::default();
-    let session_layer = SessionManagerLayer::new(session_store)
-        .with_secure(false)
-        .with_expiry(Expiry::OnSessionEnd);
+    // let on_inactivity = Expiry::OnInactivity(Duration::weeks(2));
+    let session_layer = SessionManagerLayer::new(session_store).with_secure(false);
 
     let middlewares = ServiceBuilder::new()
         .layer(TraceLayer::new_for_http())
@@ -37,7 +44,9 @@ async fn main() {
         .with_state(state)
         .layer(middlewares);
 
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
 
     tracing::debug!("listening on {}", listener.local_addr().unwrap());
     axum::serve(listener, app).await.unwrap();

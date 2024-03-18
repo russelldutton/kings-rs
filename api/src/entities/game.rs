@@ -1,11 +1,18 @@
-use super::{card::Card, player::Player, round::Round};
+use serde::Serialize;
 
+#[derive(Debug)]
 pub struct Game {
-    pub id: i32,
+    pub id: i64,
     pub session_code: String,
-    pub host: String, // player id
-    pub is_started: bool,
-    pub rounds: Vec<Round>,
-    pub deck: Vec<Card>,
-    pub players: Vec<Player>,
+    pub player_host: i64,
+    pub status: GameStatus
+}
+
+
+#[derive(Debug, Clone, sqlx::Type, PartialEq, Serialize)]
+#[sqlx(type_name = "TEXT", rename_all = "lowercase")]
+pub enum GameStatus {
+    Setup,
+    InProgress,
+    Ended
 }

@@ -5,7 +5,7 @@ use super::role::Role;
 #[derive(Serialize)]
 pub struct Player {
     pub id: i64,
-    pub nick_name: String,
+    pub user_id: i64,
     pub role: Option<Role>,
-    pub game_id: Option<i64>
+    pub game_id: Option<i64>,
 }

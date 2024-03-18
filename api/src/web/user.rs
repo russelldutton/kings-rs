@@ -23,7 +23,7 @@ async fn register_user_handler(
     match register_user(&state.db_url, nick_name).await {
         Ok(response) => {
             session.insert(USER_ID_KEY, response.id).await.unwrap();
-            Ok(response)
+            Ok(Json(response))
         }
         Err(err) => Err(err.to_string()),
     }
@@ -31,7 +31,7 @@ async fn register_user_handler(
 
 async fn get_users_handler(State(state): State<Arc<AppState>>) -> Result<Json<Vec<User>>, String> {
     match fetch_users(&state.db_url).await {
-        Ok(res) => Ok(res),
+        Ok(res) => Ok(Json(res)),
         Err(err) => Err(err.to_string()),
     }
 }
