@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use super::role::Role;
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Player {
     pub id: i64,
     pub user_id: i64,

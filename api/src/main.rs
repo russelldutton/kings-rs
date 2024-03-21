@@ -1,5 +1,6 @@
 use axum::{response::Html, routing::get, Router};
 use chrono::prelude::*;
+use tracing::instrument;
 use std::sync::Arc;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -23,6 +24,12 @@ pub const USER_ID_KEY: &str = "user_id";
 
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt()
+        .with_max_level(tracing::Level::DEBUG)
+        .with_target(false)
+        .pretty()
+        .init();
+
     let state = Arc::new(AppState {
         db_url: DB_URL.to_string(),
     });
@@ -32,7 +39,7 @@ async fn main() {
     let session_layer = SessionManagerLayer::new(session_store).with_secure(false);
 
     let middlewares = ServiceBuilder::new()
-        .layer(TraceLayer::new_for_http())
+        // .layer(TraceLayer::new_for_http())
         .layer(CorsLayer::new().allow_origin(Any))
         .layer(CompressionLayer::new())
         .layer(session_layer);
