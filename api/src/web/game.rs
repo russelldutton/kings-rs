@@ -29,6 +29,7 @@ pub fn game_routes() -> Router<Arc<AppState>> {
         .route("/game", get(get_game_by))
 }
 
+#[instrument]
 async fn create_game_lobby_handler(
     session: Session,
     State(state): State<Arc<AppState>>,
@@ -48,6 +49,7 @@ async fn create_game_lobby_handler(
     }))
 }
 
+#[instrument]
 pub async fn join_game_lobby_handler(
     session: Session,
     State(state): State<Arc<AppState>>,
