@@ -1,10 +1,5 @@
-use serde::{Deserialize, Serialize};
-use std::sync::Arc;
-use tower_sessions::Session;
-use tracing::instrument;
-
 use crate::{
-    common::app_state::AppState,
+    common::{app_error::AppError, app_state::AppState},
     core::game::{
         create_game_lobby, create_player_in_game, get_game_by_id, get_game_by_session_code,
     },
@@ -19,6 +14,10 @@ use axum::{
     routing::get,
     Json, Router,
 };
+use serde::{Deserialize, Serialize};
+use std::sync::Arc;
+use tower_sessions::Session;
+use tracing::instrument;
 
 pub fn game_routes() -> Router<Arc<AppState>> {
     Router::new()
@@ -33,26 +32,14 @@ pub fn game_routes() -> Router<Arc<AppState>> {
 async fn create_game_lobby_handler(
     session: Session,
     State(state): State<Arc<AppState>>,
-) -> Result<Json<PlayerModel>, String> {
+) -> Result<Json<PlayerModel>, AppError> {
     let user_id: i64 = session.get(USER_ID_KEY).await.unwrap().unwrap();
 
     let session_code = generate_random_code();
 
-    let game_result = create_game_lobby(&state.db_url, user_id, session_code).await;
+    let game = create_game_lobby(&state.db_url, user_id, session_code).await?;
 
-    if let Err(err) = game_result {
-        return Err(err.to_string());
-    }
-
-    let game = game_result.unwrap();
-
-    let player_result = create_player_in_game(&state.db_url, user_id, game.id).await;
-
-    if let Err(err) = player_result {
-        return Err(err.to_string());
-    }
-
-    let player = player_result.unwrap();
+    let player = create_player_in_game(&state.db_url, user_id, game.id).await?;
 
     Ok(Json(PlayerModel {
         id: player.id,
@@ -65,22 +52,12 @@ pub async fn join_game_lobby_handler(
     session: Session,
     State(state): State<Arc<AppState>>,
     Path(session_code): Path<String>,
-) -> Result<Json<PlayerModel>, String> {
+) -> Result<Json<PlayerModel>, AppError> {
     let user_id: i64 = session.get(USER_ID_KEY).await.unwrap().unwrap();
 
-    let game_result = get_game_by_session_code(&state.db_url, session_code).await;
-    if let Err(err) = game_result {
-        return Err(err.to_string());
-    }
+    let game = get_game_by_session_code(&state.db_url, session_code).await?;
 
-    let game = game_result.unwrap();
-
-    let player_result = create_player_in_game(&state.db_url, user_id, game.id).await;
-    if let Err(err) = player_result {
-        return Err(err.to_string());
-    }
-
-    let player = player_result.unwrap();
+    let player = create_player_in_game(&state.db_url, user_id, game.id).await?;
 
     Ok(Json(PlayerModel {
         id: player.id,
@@ -99,18 +76,18 @@ pub struct GameSearch {
 pub async fn get_game_by(
     State(state): State<Arc<AppState>>,
     Query(search): Query<GameSearch>,
-) -> Result<Json<Game>, String> {
+) -> Result<Json<Game>, AppError> {
     if let Some(game_id) = search.id {
-        let game = get_game_by_id(&state.db_url, game_id).await.unwrap();
+        let game = get_game_by_id(&state.db_url, game_id).await?;
 
         Ok(Json(game))
     } else if let Some(session_code) = search.session {
-        let game = get_game_by_session_code(&state.db_url, session_code)
-            .await
-            .unwrap();
+        let game = get_game_by_session_code(&state.db_url, session_code).await?;
 
         Ok(Json(game))
     } else {
-        Err("No search parameters provided".to_string())
+        Err(AppError::ArgumentError(
+            "No filter arguments supplied".to_string(),
+        ))
     }
 }
