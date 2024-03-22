@@ -6,7 +6,6 @@ use crate::{
     entities::game::Game,
     models::player_model::PlayerModel,
     util::{game_session_code::generate_random_code, user_session::get_user_id_from_session},
-    USER_ID_KEY,
 };
 use axum::{
     extract::{Path, Query, State},
@@ -35,12 +34,9 @@ async fn create_game_lobby_handler(
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<PlayerModel>, AppError> {
     let user_id: i64 = get_user_id_from_session(session).await?;
-
     let session_code = generate_random_code();
-
-    let game = create_game_lobby(&state.db_url, user_id, session_code).await?;
-
-    let player = create_player_in_game(&state.db_url, user_id, game.id).await?;
+    let game = create_game_lobby(&state.pool, user_id, session_code).await?;
+    let player = create_player_in_game(&state.pool, user_id, game.id).await?;
 
     Ok(Json(PlayerModel {
         id: player.id,
@@ -56,10 +52,8 @@ pub async fn join_game_lobby_handler(
     Path(session_code): Path<String>,
 ) -> Result<Json<PlayerModel>, AppError> {
     let user_id: i64 = get_user_id_from_session(session).await?;
-
-    let game = get_game_by_session_code(&state.db_url, session_code).await?;
-
-    let player = create_player_in_game(&state.db_url, user_id, game.id).await?;
+    let game = get_game_by_session_code(&state.pool, session_code).await?;
+    let player = create_player_in_game(&state.pool, user_id, game.id).await?;
 
     Ok(Json(PlayerModel {
         id: player.id,
@@ -80,13 +74,11 @@ pub async fn get_game_by(
     Query(search): Query<GameSearch>,
 ) -> Result<Json<Game>, AppError> {
     if let Some(game_id) = search.id {
-        let game = get_game_by_id(&state.db_url, game_id).await?;
-
-        Ok(Json(game))
+        Ok(Json(get_game_by_id(&state.pool, game_id).await?))
     } else if let Some(session_code) = search.session {
-        let game = get_game_by_session_code(&state.db_url, session_code).await?;
-
-        Ok(Json(game))
+        Ok(Json(
+            get_game_by_session_code(&state.pool, session_code).await?,
+        ))
     } else {
         Err(AppError::ArgumentError(
             "No filter arguments supplied".to_string(),

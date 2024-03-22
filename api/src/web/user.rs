@@ -23,7 +23,7 @@ async fn register_user_handler(
     State(state): State<Arc<AppState>>,
     session: Session,
 ) -> Result<Json<User>, AppError> {
-    let user = register_user(&state.db_url, nick_name).await?;
+    let user = register_user(&state.pool, nick_name).await?;
     session.insert(USER_ID_KEY, user.id).await.unwrap();
     Ok(Json(user))
 }
@@ -31,5 +31,5 @@ async fn register_user_handler(
 async fn get_users_handler(
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<Vec<User>>, AppError> {
-    Ok(Json(fetch_users(&state.db_url).await?))
+    Ok(Json(fetch_users(&state.pool).await?))
 }

@@ -11,7 +11,6 @@ pub enum AppError {
     DbError(sqlx::Error),
     AxumError(axum::Error),
     ArgumentError(String),
-    SessionNotFound,
     SessionError(tower_sessions::session::Error),
 }
 
@@ -29,10 +28,7 @@ impl IntoResponse for AppError {
             AppError::AxumError(axum_error) => {
                 (StatusCode::INTERNAL_SERVER_ERROR, axum_error.to_string())
             }
-            AppError::ArgumentError(error) => (StatusCode::BAD_REQUEST, error),
-            AppError::SessionNotFound => {
-                (StatusCode::UNAUTHORIZED, "User not recognized".to_string())
-            }
+            AppError::ArgumentError(message) => (StatusCode::BAD_REQUEST, message),
             AppError::SessionError(error) => (StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
         };
 

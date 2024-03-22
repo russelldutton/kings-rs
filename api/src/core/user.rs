@@ -1,33 +1,26 @@
-use axum::Json;
-use sqlx::SqlitePool;
+use crate::{common::app_state::Pool, entities::user::User};
 
-use crate::entities::user::User;
-
-pub async fn register_user(db_url: &str, nick_name: String) -> Result<User, sqlx::Error> {
+pub async fn register_user(pool: &Pool, nick_name: String) -> Result<User, sqlx::Error> {
     tracing::info!("New player with nick_name {}", nick_name);
-
-    let connection = SqlitePool::connect(db_url).await?;
 
     let new_user: User = sqlx::query_as!(
         User,
         "INSERT INTO users (nick_name) VALUES (?) RETURNING id, nick_name",
         nick_name
     )
-    .fetch_one(&connection).await?;
+    .fetch_one(pool)
+    .await?;
 
     tracing::info!("Created new player: {}", new_user);
     Ok(new_user)
 }
 
-pub async fn fetch_users(db_url: &str) -> Result<Vec<User>, sqlx::Error> {
+pub async fn fetch_users(pool: &Pool) -> Result<Vec<User>, sqlx::Error> {
     tracing::info!("Fetching all users");
 
-    let connection = SqlitePool::connect(db_url).await?;
-
-    let users = sqlx::query_as!(
-        User,
-        "SELECT * FROM users")
-    .fetch_all(&connection).await?;
+    let users = sqlx::query_as!(User, "SELECT * FROM users")
+        .fetch_all(pool)
+        .await?;
 
     tracing::info!("Returned {} users", users.len());
 

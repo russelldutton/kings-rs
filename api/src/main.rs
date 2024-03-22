@@ -1,5 +1,6 @@
 use axum::{response::Html, routing::get, Router};
 use chrono::prelude::*;
+use sqlx::SqlitePool;
 use std::sync::Arc;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -29,9 +30,13 @@ async fn main() {
         .pretty()
         .init();
 
-    let state = Arc::new(AppState {
-        db_url: DB_URL.to_string(),
-    });
+    let pool_result = SqlitePool::connect(DB_URL).await;
+    if let Err(_) = pool_result {
+        panic!("Error acquiring db pool");
+    }
+    let pool = pool_result.unwrap();
+
+    let state = Arc::new(AppState { pool });
 
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store).with_secure(false);
