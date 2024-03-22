@@ -11,6 +11,8 @@ pub enum AppError {
     DbError(sqlx::Error),
     AxumError(axum::Error),
     ArgumentError(String),
+    SessionNotFound,
+    SessionError(tower_sessions::session::Error),
 }
 
 impl IntoResponse for AppError {
@@ -28,6 +30,10 @@ impl IntoResponse for AppError {
                 (StatusCode::INTERNAL_SERVER_ERROR, axum_error.to_string())
             }
             AppError::ArgumentError(error) => (StatusCode::BAD_REQUEST, error),
+            AppError::SessionNotFound => {
+                (StatusCode::UNAUTHORIZED, "User not recognized".to_string())
+            }
+            AppError::SessionError(error) => (StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
         };
 
         (status, Json(ErrorResponse { message })).into_response()
@@ -43,5 +49,11 @@ impl From<sqlx::Error> for AppError {
 impl From<axum::Error> for AppError {
     fn from(err: axum::Error) -> Self {
         AppError::AxumError(err)
+    }
+}
+
+impl From<tower_sessions::session::Error> for AppError {
+    fn from(error: tower_sessions::session::Error) -> Self {
+        AppError::SessionError(error)
     }
 }

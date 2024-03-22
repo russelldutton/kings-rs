@@ -1,12 +1,15 @@
-use std::sync::Arc;
-
 use crate::{
-    common::app_state::AppState,
-    core::user::{ fetch_users, register_user },
+    common::{app_error::AppError, app_state::AppState},
+    core::user::{fetch_users, register_user},
     entities::user::User,
     USER_ID_KEY,
 };
-use axum::{ extract::{ Path, State }, routing::get, Json, Router };
+use axum::{
+    extract::{Path, State},
+    routing::get,
+    Json, Router,
+};
+use std::sync::Arc;
 use tower_sessions::Session;
 
 pub fn user_routes() -> Router<Arc<AppState>> {
@@ -18,20 +21,15 @@ pub fn user_routes() -> Router<Arc<AppState>> {
 async fn register_user_handler(
     Path(nick_name): Path<String>,
     State(state): State<Arc<AppState>>,
-    session: Session
-) -> Result<Json<User>, String> {
-    match register_user(&state.db_url, nick_name).await {
-        Ok(response) => {
-            session.insert(USER_ID_KEY, response.id).await.unwrap();
-            Ok(Json(response))
-        }
-        Err(err) => Err(err.to_string()),
-    }
+    session: Session,
+) -> Result<Json<User>, AppError> {
+    let user = register_user(&state.db_url, nick_name).await?;
+    session.insert(USER_ID_KEY, user.id).await.unwrap();
+    Ok(Json(user))
 }
 
-async fn get_users_handler(State(state): State<Arc<AppState>>) -> Result<Json<Vec<User>>, String> {
-    match fetch_users(&state.db_url).await {
-        Ok(res) => Ok(Json(res)),
-        Err(err) => Err(err.to_string()),
-    }
+async fn get_users_handler(
+    State(state): State<Arc<AppState>>,
+) -> Result<Json<Vec<User>>, AppError> {
+    Ok(Json(fetch_users(&state.db_url).await?))
 }

@@ -5,7 +5,7 @@ use crate::{
     },
     entities::game::Game,
     models::player_model::PlayerModel,
-    util::session_code::generate_random_code,
+    util::{game_session_code::generate_random_code, user_session::get_user_id_from_session},
     USER_ID_KEY,
 };
 use axum::{
@@ -34,7 +34,7 @@ async fn create_game_lobby_handler(
     session: Session,
     State(state): State<Arc<AppState>>,
 ) -> Result<Json<PlayerModel>, AppError> {
-    let user_id: i64 = session.get(USER_ID_KEY).await.unwrap().unwrap();
+    let user_id: i64 = get_user_id_from_session(session).await?;
 
     let session_code = generate_random_code();
 
@@ -55,7 +55,7 @@ pub async fn join_game_lobby_handler(
     State(state): State<Arc<AppState>>,
     Path(session_code): Path<String>,
 ) -> Result<Json<PlayerModel>, AppError> {
-    let user_id: i64 = session.get(USER_ID_KEY).await.unwrap().unwrap();
+    let user_id: i64 = get_user_id_from_session(session).await?;
 
     let game = get_game_by_session_code(&state.db_url, session_code).await?;
 

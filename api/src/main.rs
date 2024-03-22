@@ -39,7 +39,7 @@ async fn main() {
     let middlewares = ServiceBuilder::new()
         .layer(TraceLayer::new_for_http())
         .layer(CorsLayer::new().allow_origin(Any))
-        .layer(CompressionLayer::new())
+        .layer(CompressionLayer::new().br(true).gzip(true))
         .layer(session_layer);
 
     let app = Router::new()
