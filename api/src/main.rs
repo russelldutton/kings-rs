@@ -1,6 +1,5 @@
 use axum::{response::Html, routing::get, Router};
 use chrono::prelude::*;
-use tracing::instrument;
 use std::sync::Arc;
 use tower::ServiceBuilder;
 use tower_http::{
@@ -15,9 +14,9 @@ use crate::common::app_state::AppState;
 mod common;
 mod core;
 mod entities;
-mod web;
-mod util;
 mod models;
+mod util;
+mod web;
 
 const DB_URL: &str = "sqlite://kings.db";
 pub const USER_ID_KEY: &str = "user_id";
@@ -35,17 +34,16 @@ async fn main() {
     });
 
     let session_store = MemoryStore::default();
-    // let on_inactivity = Expiry::OnInactivity(Duration::weeks(2));
     let session_layer = SessionManagerLayer::new(session_store).with_secure(false);
 
     let middlewares = ServiceBuilder::new()
-        // .layer(TraceLayer::new_for_http())
+        .layer(TraceLayer::new_for_http())
         .layer(CorsLayer::new().allow_origin(Any))
         .layer(CompressionLayer::new())
         .layer(session_layer);
 
     let app = Router::new()
-        .route("/", get(handler))
+        .route("/", get(health_check))
         .merge(web::user::user_routes())
         .merge(web::game::game_routes())
         .with_state(state)
@@ -59,7 +57,7 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn handler() -> Html<String> {
+async fn health_check() -> Html<String> {
     let current_date = Utc::now();
     let return_str = format!("<h1>Healthy! {current_date}</h1>");
     Html(return_str)

@@ -1,4 +1,4 @@
-use rand::{Rng, thread_rng};
+use rand::{thread_rng, Rng};
 
 pub fn generate_random_code() -> String {
     let chars: Vec<char> = (48..58) // ASCII values for numbers 0-9
@@ -14,6 +14,7 @@ pub fn generate_random_code() -> String {
     code
 }
 
+#[cfg(test)]
 mod tests {
     use std::collections::HashSet;
 
@@ -28,8 +29,7 @@ mod tests {
     }
 
     #[test]
-    fn ensure_right_length()
-    {
+    fn ensure_right_length() {
         let code = generate_random_code();
 
         assert_eq!(code.len(), 4);
