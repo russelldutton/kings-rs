@@ -4,7 +4,9 @@ use axum::{
     Json,
 };
 use serde::Serialize;
+use strum_macros::Display;
 
+#[derive(Display, Debug)]
 pub enum AppError {
     DbError(sqlx::Error),
     AxumError(axum::Error),
