@@ -20,7 +20,6 @@ mod util;
 mod web;
 
 const DB_URL: &str = "sqlite://kings.db";
-pub const USER_ID_KEY: &str = "user_id";
 
 #[tokio::main]
 async fn main() {

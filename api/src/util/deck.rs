@@ -29,3 +29,15 @@ pub fn generate_deck() -> Vec<CardModel> {
         })
         .collect_vec()
 }
+
+#[cfg(test)]
+mod test {
+    use super::generate_deck;
+
+    #[test]
+    fn ensure_full_deck() {
+        let deck = generate_deck();
+
+        assert_eq!(deck.len(), 52);
+    }
+}

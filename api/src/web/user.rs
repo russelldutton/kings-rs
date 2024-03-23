@@ -2,7 +2,7 @@ use crate::{
     common::{app_error::AppError, app_state::AppState},
     core::user::{fetch_users, register_user},
     entities::user::User,
-    USER_ID_KEY,
+    util::user_session::add_user_id_to_session,
 };
 use axum::{
     extract::{Path, State},
@@ -24,7 +24,7 @@ async fn register_user_handler(
     session: Session,
 ) -> Result<Json<User>, AppError> {
     let user = register_user(&state.pool, nick_name).await?;
-    session.insert(USER_ID_KEY, user.id).await.unwrap();
+    add_user_id_to_session(session, user.id).await?;
     Ok(Json(user))
 }
 
