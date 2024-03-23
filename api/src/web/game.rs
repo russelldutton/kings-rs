@@ -1,11 +1,13 @@
 use crate::{
     common::{app_error::AppError, app_state::AppState},
-    core::game::{
-        create_game_lobby, create_player_in_game, get_game_by_id, get_game_by_session_code,
+    core::{
+        card::create_cards_in_game,
+        game::{get_game_by_id, get_game_by_session_code, update_game_status},
+        player::get_players_in_game,
     },
-    entities::game::Game,
+    entities::game::{Game, GameStatus},
     models::player_model::PlayerModel,
-    util::{game_session_code::generate_random_code, user_session::get_user_id_from_session},
+    util::deck::generate_deck,
 };
 use axum::{
     extract::{Path, Query, State},
@@ -13,53 +15,53 @@ use axum::{
     routing::get,
     Json, Router,
 };
+use itertools::Itertools;
+use rand::seq::SliceRandom;
+use rand::thread_rng;
 use serde::{Deserialize, Serialize};
 use std::sync::Arc;
-use tower_sessions::Session;
 use tracing::instrument;
+
+use super::game_lobby::game_lobby_routes;
 
 pub fn game_routes() -> Router<Arc<AppState>> {
     Router::new()
-        .route("/game/lobby/create", get(create_game_lobby_handler))
-        .route(
-            "/game/lobby/join/:session_code",
-            get(join_game_lobby_handler),
-        )
+        .nest("/game/lobby", game_lobby_routes())
         .route("/game", get(get_game_by))
+        .route("/game/:id/setup", get(prepare_game))
 }
 
-#[instrument]
-async fn create_game_lobby_handler(
-    session: Session,
+pub async fn prepare_game(
     State(state): State<Arc<AppState>>,
-) -> Result<Json<PlayerModel>, AppError> {
-    let user_id: i64 = get_user_id_from_session(session).await?;
-    let session_code = generate_random_code();
-    let game = create_game_lobby(&state.pool, user_id, session_code).await?;
-    let player = create_player_in_game(&state.pool, user_id, game.id).await?;
+    Path(game_id): Path<i64>,
+) -> Result<(), AppError> {
+    let game = get_game_by_id(&state.pool, game_id).await?;
+    if game.status != GameStatus::Created {
+        return Err(AppError::InvalidGameState(
+            "Cannot prepare game not in Created status".to_string(),
+        ));
+    }
+    update_game_status(&state.pool, game_id, GameStatus::Preparation).await?;
+    let players = get_players_in_game(&state.pool, game_id).await?;
 
-    Ok(Json(PlayerModel {
-        id: player.id,
-        game_id: game.id,
-        session_code: game.session_code,
-    }))
-}
+    let mut new_deck = generate_deck();
+    new_deck.shuffle(&mut thread_rng());
 
-#[instrument]
-pub async fn join_game_lobby_handler(
-    session: Session,
-    State(state): State<Arc<AppState>>,
-    Path(session_code): Path<String>,
-) -> Result<Json<PlayerModel>, AppError> {
-    let user_id: i64 = get_user_id_from_session(session).await?;
-    let game = get_game_by_session_code(&state.pool, session_code).await?;
-    let player = create_player_in_game(&state.pool, user_id, game.id).await?;
+    let player_models = new_deck
+        .iter()
+        .chunks(players.len())
+        .into_iter()
+        .zip(players)
+        .map(|(cards, player)| PlayerModel {
+            game_id,
+            id: player.id,
+            hand: cards.cloned().collect_vec(),
+        })
+        .collect_vec();
 
-    Ok(Json(PlayerModel {
-        id: player.id,
-        game_id: game.id,
-        session_code: game.session_code,
-    }))
+    create_cards_in_game(&state.pool, player_models).await?;
+
+    Ok(())
 }
 
 #[derive(Serialize, Deserialize, Debug)]

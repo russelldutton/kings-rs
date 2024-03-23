@@ -33,7 +33,7 @@ async fn create_game_lobby_handler(
     Ok(Json(PlayerModel {
         id: player.id,
         game_id: game.id,
-        session_code: game.session_code,
+        hand: vec![],
     }))
 }
 
@@ -50,6 +50,6 @@ pub async fn join_game_lobby_handler(
     Ok(Json(PlayerModel {
         id: player.id,
         game_id: game.id,
-        session_code: game.session_code,
+        hand: vec![],
     }))
 }

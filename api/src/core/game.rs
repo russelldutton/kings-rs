@@ -1,12 +1,11 @@
 use crate::{
-    common::app_state::Pool,
+    common::{app_error::AppError, app_state::Pool},
     entities::{
         game::{Game, GameStatus},
         player::Player,
     },
     models::role::Role,
 };
-use tracing::instrument;
 
 pub async fn create_game_lobby(
     pool: &Pool,
@@ -77,7 +76,6 @@ pub async fn get_game_by_id(pool: &Pool, game_id: i64) -> Result<Game, sqlx::Err
     Ok(game)
 }
 
-#[instrument]
 pub async fn get_game_by_session_code(
     pool: &Pool,
     session_code: String,
@@ -98,4 +96,19 @@ pub async fn get_game_by_session_code(
 
     tracing::info!("Found game by id: {:?}", game);
     Ok(game)
+}
+
+pub async fn update_game_status(
+    pool: &Pool,
+    game_id: i64,
+    status: GameStatus,
+) -> Result<(), AppError> {
+    tracing::info!("Updating game {} to status {}", game_id, status);
+
+    sqlx::query!("UPDATE games SET status = ? WHERE id = ?", status, game_id)
+        .execute(pool)
+        .await?;
+
+    tracing::info!("Successfully updated status.");
+    Ok(())
 }

@@ -1,2 +1,4 @@
-pub mod user;
+pub mod card;
 pub mod game;
+pub mod player;
+pub mod user;

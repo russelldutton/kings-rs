@@ -1,5 +1,5 @@
 use serde::Serialize;
-use strum_macros::EnumString;
+use strum_macros::{Display, EnumString};
 
 #[derive(Serialize, Debug, sqlx::FromRow)]
 pub struct Game {
@@ -9,7 +9,7 @@ pub struct Game {
     pub status: GameStatus,
 }
 
-#[derive(Debug, Clone, sqlx::Type, PartialEq, Serialize, EnumString)]
+#[derive(Debug, Clone, sqlx::Type, PartialEq, Serialize, EnumString, Display)]
 #[sqlx(type_name = "TEXT", rename_all = "lowercase")]
 #[strum(serialize_all = "lowercase")]
 pub enum GameStatus {
