@@ -1,6 +1,6 @@
 use super::{card::Card, player::Player, round::Round};
 
-pub struct Game {
+pub struct GameModel {
     pub id: i32,
     pub session_code: String,
     pub host: String, // player id
