@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-use super::role::Role;
+use crate::models::role::Role;
 
 #[derive(Serialize, Debug)]
 pub struct Player {

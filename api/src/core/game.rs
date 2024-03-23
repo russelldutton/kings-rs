@@ -3,8 +3,8 @@ use crate::{
     entities::{
         game::{Game, GameStatus},
         player::Player,
-        role::Role,
     },
+    models::role::Role,
 };
 use tracing::instrument;
 

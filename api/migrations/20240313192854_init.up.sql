@@ -50,8 +50,8 @@ CREATE TABLE IF NOT EXISTS cards
     id          INTEGER PRIMARY KEY,
     rank        TEXT  NOT NULL,
     suit        TEXT  NOT NULL,
-    game_id     INTEGER,
-    player_id   INTEGER,
+    game_id     INTEGER NOT NULL,
+    player_id   INTEGER NOT NULL,
     turn_id     INTEGER,
     FOREIGN KEY(game_id) REFERENCES games(id),
     FOREIGN KEY(player_id) REFERENCES players(id),
@@ -60,7 +60,11 @@ CREATE TABLE IF NOT EXISTS cards
 
 CREATE TABLE IF NOT EXISTS swaps
 (
-    id            INTEGER PRIMARY KEY,
-    session_code  TEXT  NOT NULL,
-    player_host   INTEGER  NOT NULL
+    id                      INTEGER PRIMARY KEY,
+    donor_player_id         INTEGER NOT NULL,
+    recipient_player_id     INTEGER NOT NULL,
+    card_id                 INTEGER NOT NULL,
+    FOREIGN KEY(donor_player_id)     REFERENCES players(id),
+    FOREIGN KEY(recipient_player_id) REFERENCES players(id),
+    FOREIGN KEY(card_id)             REFERENCES cards(id)
 );
