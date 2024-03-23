@@ -25,5 +25,8 @@
     ],
     "sqltools.useNodeRuntime": true,
     "CodeGPT.apiKey": "Ollama"
+  },
+  "extensions": {
+    "recommendations": ["bruno-api-client.bruno", "usernamehw.errorlens"]
   }
 }
