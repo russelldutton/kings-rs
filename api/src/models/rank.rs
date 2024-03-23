@@ -1,6 +1,6 @@
 use serde::Serialize;
 
-#[derive(Serialize)]
+#[derive(Serialize, Copy, Clone)]
 pub enum Rank {
     Three,
     Four,

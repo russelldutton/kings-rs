@@ -4,5 +4,5 @@ use serde::Serialize;
 pub struct PlayerModel {
     pub id: i64,
     pub game_id: i64,
-    pub session_code: String
+    pub session_code: String,
 }

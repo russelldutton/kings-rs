@@ -24,7 +24,7 @@ pub async fn create_game_lobby(
             "#,
         session_code,
         user_id,
-        GameStatus::Setup
+        GameStatus::Created
     )
     .fetch_one(pool)
     .await?;
@@ -92,7 +92,7 @@ pub async fn get_game_by_session_code(
         "#,
     )
     .bind(session_code)
-    .bind(GameStatus::Setup)
+    .bind(GameStatus::Created)
     .fetch_one(pool)
     .await?;
 
