@@ -18,6 +18,7 @@ mod entities;
 mod models;
 mod util;
 mod web;
+mod simulation_test;
 
 const DB_URL: &str = "sqlite://kings.db";
 
@@ -36,7 +37,17 @@ async fn main() {
     let pool = pool_result.unwrap();
 
     let state = Arc::new(AppState { pool });
+    let app = create_app(state);
 
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
+        .await
+        .unwrap();
+
+    tracing::debug!("listening on {}", listener.local_addr().unwrap());
+    axum::serve(listener, app).await.unwrap();
+}
+
+fn create_app(state: Arc<AppState>) -> Router {
     let session_store = MemoryStore::default();
     let session_layer = SessionManagerLayer::new(session_store).with_secure(false);
 
@@ -46,19 +57,12 @@ async fn main() {
         .layer(CompressionLayer::new().br(true).gzip(true))
         .layer(session_layer);
 
-    let app = Router::new()
+    Router::new()
         .route("/", get(health_check))
         .merge(web::user::user_routes())
         .merge(web::game::game_routes())
         .with_state(state)
-        .layer(middlewares);
-
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000")
-        .await
-        .unwrap();
-
-    tracing::debug!("listening on {}", listener.local_addr().unwrap());
-    axum::serve(listener, app).await.unwrap();
+        .layer(middlewares)
 }
 
 async fn health_check() -> Html<String> {
