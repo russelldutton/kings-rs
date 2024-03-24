@@ -2,15 +2,15 @@ use crate::{
     common::{app_error::AppError, app_state::AppState},
     core::{
         card::create_cards_in_game,
-        game::{get_game_by_id, get_game_by_session_code, update_game_status},
-        player::get_players_in_game,
+        game::{get_current_round, get_game_by_id, update_game_status},
+        player::{fetch_opponents, get_players_in_game},
     },
-    entities::game::{Game, GameStatus},
-    models::player_model::PlayerModel,
+    entities::game::GameStatus,
+    models::{game_model::GameModel, player_model::PlayerModel},
     util::{deck::generate_deck, user_session::get_user_id_from_session},
 };
 use axum::{
-    extract::{Path, Query, State},
+    extract::{Path, State},
     response::Result,
     routing::get,
     Json, Router,
@@ -18,17 +18,15 @@ use axum::{
 use itertools::Itertools;
 use rand::seq::SliceRandom;
 use rand::thread_rng;
-use serde::{Deserialize, Serialize};
 use std::sync::Arc;
 use tower_sessions::Session;
-use tracing::instrument;
 
 use super::game_lobby::game_lobby_routes;
 
 pub fn game_routes() -> Router<Arc<AppState>> {
     Router::new()
         .nest("/game/lobby", game_lobby_routes())
-        .route("/game", get(get_game_by))
+        .route("/game/:id", get(fetch_game_state))
         .route("/game/:id/prepare", get(prepare_game))
 }
 
@@ -78,26 +76,19 @@ pub async fn prepare_game(
     Ok(())
 }
 
-#[derive(Serialize, Deserialize, Debug)]
-pub struct GameSearch {
-    pub session: Option<String>,
-    pub id: Option<i64>,
-}
-
-#[instrument]
-pub async fn get_game_by(
+pub async fn fetch_game_state(
     State(state): State<Arc<AppState>>,
-    Query(search): Query<GameSearch>,
-) -> Result<Json<Game>, AppError> {
-    if let Some(game_id) = search.id {
-        Ok(Json(get_game_by_id(&state.pool, game_id).await?))
-    } else if let Some(session_code) = search.session {
-        Ok(Json(
-            get_game_by_session_code(&state.pool, session_code).await?,
-        ))
-    } else {
-        Err(AppError::ArgumentError(
-            "No filter arguments supplied".to_string(),
-        ))
-    }
+    Path(game_id): Path<i64>,
+) -> Result<Json<GameModel>, AppError> {
+    let game = get_game_by_id(&state.pool, game_id).await?;
+    let players = fetch_opponents(&state.pool, game_id).await?;
+    let round = get_current_round(&state.pool, game_id).await?;
+
+    Ok(Json(GameModel {
+        id: game_id,
+        session_code: game.session_code,
+        is_started: game.status != GameStatus::Created,
+        current_round: round,
+        players,
+    }))
 }

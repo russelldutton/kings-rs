@@ -1,13 +1,12 @@
 use serde::Serialize;
 
-use crate::entities::{card::Card, player::Player, round::Round};
+use super::{opponent_model::OpponentModel, round_model::RoundModel};
 
 #[derive(Serialize)]
 pub struct GameModel {
-    pub id: i32,
+    pub id: i64,
     pub session_code: String,
     pub is_started: bool,
-    pub rounds: Vec<Round>,
-    pub deck: Vec<Card>,
-    pub players: Vec<Player>,
+    pub current_round: Option<RoundModel>,
+    pub players: Vec<OpponentModel>,
 }

@@ -3,8 +3,9 @@ use crate::{
     entities::{
         game::{Game, GameStatus},
         player::Player,
+        round::Round,
     },
-    models::role::Role,
+    models::{rank::Rank, role::Role, round_model::RoundModel},
 };
 
 pub async fn create_game_lobby(
@@ -111,4 +112,22 @@ pub async fn update_game_status(
 
     tracing::info!("Successfully updated status.");
     Ok(())
+}
+
+pub async fn get_current_round(pool: &Pool, game_id: i64) -> Result<Option<RoundModel>, AppError> {
+    tracing::info!("Fetching current round for game {}", game_id);
+
+    let round = sqlx::query_as!(
+        Round,
+        "SELECT id, rank AS `rank: Rank`, hand_size, game_id
+        FROM rounds
+        WHERE game_id = ?
+        ORDER BY id DESC
+        LIMIT 1",
+        game_id
+    )
+    .fetch_optional(pool)
+    .await?;
+
+    Ok(round.map(|r| r.into()))
 }
