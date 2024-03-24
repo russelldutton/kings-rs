@@ -1,6 +1,6 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, sqlx::Type, PartialEq, Copy, Clone)]
+#[derive(Serialize, Deserialize, sqlx::Type, PartialEq, Copy, Clone)]
 #[sqlx(type_name = "TEXT", rename_all = "lowercase")]
 pub enum Rank {
     Three,
@@ -17,4 +17,26 @@ pub enum Rank {
     Ace,
     Two,
     Joker,
+}
+
+impl From<String> for Rank {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "three" => Rank::Three,
+            "four" => Rank::Four,
+            "five" => Rank::Five,
+            "six" => Rank::Six,
+            "seven" => Rank::Seven,
+            "eight" => Rank::Eight,
+            "nine" => Rank::Nine,
+            "ten" => Rank::Ten,
+            "jack" => Rank::Jack,
+            "queen" => Rank::Queen,
+            "king" => Rank::King,
+            "ace" => Rank::Ace,
+            "two" => Rank::Two,
+            "joker" => Rank::Joker,
+            _ => Rank::Three,
+        }
+    }
 }

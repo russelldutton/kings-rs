@@ -13,6 +13,7 @@ pub enum AppError {
     ArgumentError(String),
     SessionError(tower_sessions::session::Error),
     InvalidGameState(String),
+    Forbidden(String),
 }
 
 impl IntoResponse for AppError {
@@ -32,6 +33,7 @@ impl IntoResponse for AppError {
             AppError::ArgumentError(message) => (StatusCode::BAD_REQUEST, message),
             AppError::SessionError(error) => (StatusCode::INTERNAL_SERVER_ERROR, error.to_string()),
             AppError::InvalidGameState(message) => (StatusCode::BAD_REQUEST, message),
+            AppError::Forbidden(message) => (StatusCode::FORBIDDEN, message),
         };
 
         (status, Json(ErrorResponse { message })).into_response()
