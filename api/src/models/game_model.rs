@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::{opponent_model::OpponentModel, round_model::RoundModel};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct GameModel {
     pub id: i64,
     pub session_code: String,

@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use super::role::Role;
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct OpponentModel {
     pub id: i64,
     pub nick_name: String,

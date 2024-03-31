@@ -1,10 +1,10 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::entities::round::Round;
 
 use super::rank::Rank;
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct RoundModel {
     pub rank: Rank,
     pub hand_size: i64,

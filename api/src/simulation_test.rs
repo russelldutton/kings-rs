@@ -6,8 +6,10 @@ mod tests {
     use tower_sessions::cookie::Cookie;
 
     use crate::{
-        common::app_state::AppState, create_app, entities::card::Card,
-        models::player_model::PlayerModel,
+        common::app_state::AppState,
+        create_app,
+        entities::card::Card,
+        models::{game_model::GameModel, player_model::PlayerModel},
     };
 
     #[tokio::test]
@@ -66,5 +68,14 @@ mod tests {
             .unwrap();
 
         assert_eq!(cards.len(), 52);
+
+        let game_response = server.get(format!("/game/{}", game_id).as_str()).await;
+        game_response.assert_status_success();
+
+        let game = game_response.json::<GameModel>();
+
+        assert_eq!(game.id, game_id);
+        assert_eq!(game.players.len(), users.len());
+        assert!(game.is_started);
     }
 }

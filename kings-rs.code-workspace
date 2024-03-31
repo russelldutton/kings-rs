@@ -27,6 +27,6 @@
     "CodeGPT.apiKey": "Ollama"
   },
   "extensions": {
-    "recommendations": ["bruno-api-client.bruno", "usernamehw.errorlens"]
+    "recommendations": ["usernamehw.errorlens"]
   }
 }
