@@ -1,9 +1,9 @@
 use crate::{
     common::{app_error::AppError, app_state::AppState},
-    core::{
+    data::{
         card::create_cards_in_game,
         game::{get_current_round, get_game_by_id, update_game_status},
-        player::{fetch_opponents, get_players_in_game},
+        player::{fetch_opponents, fetch_player_cards, fetch_player_in_game, get_players_in_game},
     },
     entities::game::GameStatus,
     models::{game_model::GameModel, player_model::PlayerModel},
@@ -91,4 +91,43 @@ pub async fn fetch_game_state(
         current_round: round,
         players,
     }))
+}
+
+// Play turn will always assume there are cards to play, either new round or existing
+pub async fn play_turn(
+    State(state): State<Arc<AppState>>,
+    session: Session,
+    Path(game_id): Path<i64>,
+    cards: Json<Vec<i64>>,
+) -> Result<(), AppError> {
+    if cards.len() == 0 {
+        return Err(AppError::ArgumentError(String::from(
+            "Cannot play turn without hand",
+        )));
+    }
+
+    let user_id = get_user_id_from_session(session).await?;
+
+    let player = fetch_player_in_game(&state.pool, game_id, user_id).await?;
+    let cards = fetch_player_cards(&state.pool, player.id).await?;
+    let current_round = get_current_round(&state.pool, game_id).await?;
+
+    // Ensure it is player's turn
+    // Ensure player owns cards
+    // Ensure cards are all same rank
+
+    // Fetch round information
+    // Ensure cards are at least round rank
+    // Ensure cards are hand size for round
+
+    todo!()
+}
+
+// This function will handle ending a player's turn
+pub async fn pass_turn(
+    State(state): State<Arc<AppState>>,
+    session: Session,
+    Path(game_id): Path<i64>,
+) -> Result<(), AppError> {
+    todo!()
 }

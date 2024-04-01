@@ -13,12 +13,12 @@ use tower_sessions::{MemoryStore, SessionManagerLayer};
 use crate::common::app_state::AppState;
 
 mod common;
-mod core;
+mod data;
 mod entities;
 mod models;
+mod simulation_test;
 mod util;
 mod web;
-mod simulation_test;
 
 const DB_URL: &str = "sqlite://kings.db";
 

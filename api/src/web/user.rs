@@ -1,6 +1,6 @@
 use crate::{
     common::{app_error::AppError, app_state::AppState},
-    core::user::{fetch_users, register_user},
+    data::user::{fetch_users, register_user},
     entities::user::User,
     util::user_session::add_user_id_to_session,
 };

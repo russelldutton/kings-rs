@@ -1,8 +1,8 @@
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 use crate::models::{rank::Rank, suit::Suit};
 
-#[derive(Serialize)]
+#[derive(Serialize, Deserialize)]
 pub struct Card {
     pub id: i64,
     pub rank: Rank,

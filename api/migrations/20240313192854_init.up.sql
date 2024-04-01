@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS rounds
     rank          TEXT  NOT NULL,
     hand_size     INTEGER NOT NULL,
     game_id       INTEGER NOT NULL,
+    is_ended      BOOLEAN NOT NULL,
     FOREIGN KEY(game_id) REFERENCES games(id)
 );
 
@@ -41,6 +42,7 @@ CREATE TABLE IF NOT EXISTS turns
     id            INTEGER PRIMARY KEY,
     player_id     INTEGER  NOT NULL,
     round_id      INTEGER  NOT NULL,
+    is_passed     BOOLEAN  NOT NULL,      
     FOREIGN KEY(player_id) REFERENCES players(id),
     FOREIGN KEY(round_id) REFERENCES rounds(id)
 );

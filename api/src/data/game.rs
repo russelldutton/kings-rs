@@ -2,10 +2,9 @@ use crate::{
     common::{app_error::AppError, app_state::Pool},
     entities::{
         game::{Game, GameStatus},
-        player::Player,
         round::Round,
     },
-    models::{rank::Rank, role::Role, round_model::RoundModel},
+    models::{rank::Rank, round_model::RoundModel},
 };
 
 pub async fn create_game_lobby(
@@ -31,31 +30,6 @@ pub async fn create_game_lobby(
 
     tracing::info!("Created new game: {:?}", new_game);
     Ok(new_game)
-}
-
-pub async fn create_player_in_game(
-    pool: &Pool,
-    user_id: i64,
-    game_id: i64,
-) -> Result<Player, sqlx::Error> {
-    tracing::info!("Looking for players with user_id: {}", user_id);
-
-    let role = Role::Commoner;
-
-    let player = sqlx::query_as!(
-        Player,
-        r#"
-        INSERT INTO players (user_id, game_id, role) VALUES (?, ?, ?) RETURNING id, user_id, role AS `role?: Role`, game_id
-        "#,
-        user_id,
-        game_id,
-        role
-    )
-    .fetch_one(pool)
-    .await?;
-
-    tracing::info!("Created new player: {:?} in game id: {}", player, game_id);
-    Ok(player)
 }
 
 pub async fn get_game_by_id(pool: &Pool, game_id: i64) -> Result<Game, sqlx::Error> {
@@ -119,7 +93,7 @@ pub async fn get_current_round(pool: &Pool, game_id: i64) -> Result<Option<Round
 
     let round = sqlx::query_as!(
         Round,
-        "SELECT id, rank AS `rank: Rank`, hand_size, game_id
+        "SELECT id, rank AS `rank: Rank`, hand_size, game_id, is_ended
         FROM rounds
         WHERE game_id = ?
         ORDER BY id DESC

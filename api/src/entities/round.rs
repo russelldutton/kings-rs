@@ -8,4 +8,5 @@ pub struct Round {
     pub rank: Rank,
     pub hand_size: i64,
     pub game_id: i64,
+    pub is_ended: bool,
 }

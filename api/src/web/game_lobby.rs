@@ -1,6 +1,9 @@
 use crate::{
     common::{app_error::AppError, app_state::AppState},
-    core::game::{create_game_lobby, create_player_in_game, get_game_by_session_code},
+    data::{
+        game::{create_game_lobby, get_game_by_session_code},
+        player::create_player_in_game,
+    },
     models::player_model::PlayerModel,
     util::{game_session_code::generate_random_code, user_session::get_user_id_from_session},
 };
