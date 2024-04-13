@@ -24,7 +24,10 @@
       }
     ],
     "sqltools.useNodeRuntime": true,
-    "CodeGPT.apiKey": "Ollama"
+    "CodeGPT.apiKey": "Ollama",
+    "files.associations": {
+      "*.css": "tailwindcss"
+    }
   },
   "extensions": {
     "recommendations": ["usernamehw.errorlens"]
