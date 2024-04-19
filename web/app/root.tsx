@@ -1,8 +1,16 @@
-import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "@remix-run/react";
+import {
+  Links,
+  Meta,
+  Outlet,
+  Scripts,
+  ScrollRestoration,
+} from "@remix-run/react";
 import type { LinksFunction } from "@remix-run/node";
 import stylesheet from "~/tailwind.css?url";
 
-export const links: LinksFunction = () => [{ rel: "stylesheet", href: stylesheet }];
+export const links: LinksFunction = () => [
+  { rel: "stylesheet", href: stylesheet },
+];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
@@ -14,7 +22,13 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
       </head>
       <body className="dark">
-        {children}
+        <div className="h-dvh w-dvh bg-background text-foreground">
+          <div className="h-full w-full flex items-center">
+            <div className="container bg-muted h-2/3 w-2/3 px-12 py-8 border rounded-md border-solid border-slate-500">
+              <div className="h-full w-full flex">{children}</div>
+            </div>
+          </div>
+        </div>
         <ScrollRestoration />
         <Scripts />
       </body>

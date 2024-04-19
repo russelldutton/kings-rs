@@ -27,7 +27,8 @@
     "CodeGPT.apiKey": "Ollama",
     "files.associations": {
       "*.css": "tailwindcss"
-    }
+    },
+    "typescript.preferences.autoImportFileExcludePatterns": ["@radix-ui"]
   },
   "extensions": {
     "recommendations": ["usernamehw.errorlens"]
