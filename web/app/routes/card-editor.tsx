@@ -108,9 +108,9 @@ export default function CardEditor() {
             {range(count).map((index, i) => (
               <motion.div
                 whileHover={{ scale: 1.1, y: -50 }}
-                initial={{ opacity: 0, y: 100, rotate: "0deg" }}
+                initial={{ opacity: 0, y: 40, rotate: "0deg" }}
                 animate={{ opacity: 1, y: 0, rotate: rotationClass(rotateConfig[count - 1][i]) }}
-                exit={{ opacity: 0, y: 100, rotate: "0deg" }}
+                exit={{ opacity: 0, y: 40, rotate: "0deg" }}
                 key={index}
                 className="h-3/5 w-56 bg-slate-700 absolute rounded-xl border-2 border-violet-300"
                 style={{
