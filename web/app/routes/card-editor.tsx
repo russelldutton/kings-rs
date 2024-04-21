@@ -54,7 +54,8 @@ const displayRank = (rank: Rank) => {
   }
 };
 
-const range = (target: number) => Array.from(Array(target).keys()).map((i) => i + 1);
+const range = (target: number) =>
+  Array.from(Array(target).keys()).map((i) => i + 1);
 
 const rotationClass = (rotation: number) => {
   return rotation < 0 ? `-${Math.abs(rotation)}deg` : `${rotation}deg`;
@@ -107,9 +108,13 @@ export default function CardEditor() {
           <AnimatePresence>
             {range(count).map((index, i) => (
               <motion.div
-                whileHover={{ scale: 1.1, y: -50 }}
+                whileHover={{ scale: 1.1, y: -25 }}
                 initial={{ opacity: 0, y: 40, rotate: "0deg" }}
-                animate={{ opacity: 1, y: 0, rotate: rotationClass(rotateConfig[count - 1][i]) }}
+                animate={{
+                  opacity: 1,
+                  y: 0,
+                  rotate: rotationClass(rotateConfig[count - 1][i]),
+                }}
                 exit={{ opacity: 0, y: 40, rotate: "0deg" }}
                 key={index}
                 className="h-3/5 w-56 bg-slate-700 absolute rounded-xl border-2 border-violet-300"
@@ -152,5 +157,7 @@ export default function CardEditor() {
 }
 
 const Header = ({ children }: PropsWithChildren) => (
-  <h4 className="scroll-m-20 mt-4 text-xl font-semibold tracking-tight">{children}</h4>
+  <h4 className="scroll-m-20 mt-4 text-xl font-semibold tracking-tight">
+    {children}
+  </h4>
 );
