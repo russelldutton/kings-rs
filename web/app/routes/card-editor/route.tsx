@@ -1,58 +1,9 @@
 import { PropsWithChildren, useState } from "react";
 import { Button } from "~/components/ui/button";
-import { Card } from "~/components/ui/card";
 import { cn } from "~/lib/utils";
-import { AnimatePresence, LayoutGroup, motion } from "framer-motion";
-
-const ranks = [
-  "Ace",
-  "Two",
-  "Three",
-  "Four",
-  "Five",
-  "Six",
-  "Seven",
-  "Eight",
-  "Nine",
-  "Ten",
-  "Jack",
-  "Queen",
-  "King",
-] as const;
-type Rank = (typeof ranks)[number];
-
-const suits = ["Hearts", "Diamonds", "Spades", "Clubs"] as const;
-type Suit = (typeof suits)[number];
-
-type PlayingCard = {
-  rank: Rank;
-  suit: Suit;
-};
-
-const displayRank = (rank: Rank) => {
-  switch (rank) {
-    case "Two":
-      return "2";
-    case "Three":
-      return "3";
-    case "Four":
-      return "4";
-    case "Five":
-      return "5";
-    case "Six":
-      return "6";
-    case "Seven":
-      return "7";
-    case "Eight":
-      return "8";
-    case "Nine":
-      return "9";
-    case "Ten":
-      return "10";
-    default:
-      return rank[0];
-  }
-};
+import { AnimatePresence, LayoutGroup } from "framer-motion";
+import { type CardProps, Rank, Suit, ranks, suits } from "~/types/card";
+import { PlayingCard } from "~/components/playing-card";
 
 const range = (target: number) =>
   Array.from(Array(target).keys()).map((i) => i + 1);
@@ -63,8 +14,8 @@ const rotationClass = (rotation: number) => {
 
 const rotateConfig = [[0], [-2, 1], [-4, 0, 4], [-5, 0, 5, 10]];
 
-export default function CardEditor() {
-  const [card, setCard] = useState<PlayingCard>({ rank: "Ace", suit: "Clubs" });
+export const CardEditor = () => {
+  const [card, setCard] = useState<CardProps>({ rank: "Ace", suit: "Clubs" });
   const [count, setCount] = useState(1);
 
   const setRank = (rank: Rank) => setCard({ ...card, rank });
@@ -107,31 +58,11 @@ export default function CardEditor() {
         <LayoutGroup>
           <AnimatePresence>
             {range(count).map((index, i) => (
-              <motion.div
-                whileHover={{ scale: 1.1, y: -25 }}
-                initial={{ opacity: 0, y: 40, rotate: "0deg" }}
-                animate={{
-                  opacity: 1,
-                  y: 0,
-                  rotate: rotationClass(rotateConfig[count - 1][i]),
-                }}
-                exit={{ opacity: 0, y: 40, rotate: "0deg" }}
-                key={index}
-                className="h-3/5 w-56 bg-slate-700 absolute rounded-xl border-2 border-violet-300"
-                style={{
-                  rotate: rotationClass(rotateConfig[count - 1][i]),
-                  top: "3rem",
-                  left: `${index * 2.5}rem`,
-                  zIndex: index * 10,
-                }}
-              >
-                <div className="p-4 h-full rounded-lg flex flex-col justify-between">
-                  <div className="w-full p-2 rounded-t-lg">{card.suit}</div>
-                  <div className="w-full p-2 rounded-b-lg flex justify-end items-end text-9xl">
-                    {displayRank(card.rank)}
-                  </div>
-                </div>
-              </motion.div>
+              <PlayingCard
+                card={card}
+                index={index}
+                rotation={rotateConfig[count - 1][i]}
+              />
             ))}
           </AnimatePresence>
         </LayoutGroup>
@@ -154,10 +85,12 @@ export default function CardEditor() {
       </div>
     </>
   );
-}
+};
 
 const Header = ({ children }: PropsWithChildren) => (
   <h4 className="scroll-m-20 mt-4 text-xl font-semibold tracking-tight">
     {children}
   </h4>
 );
+
+export default CardEditor;
