@@ -1,26 +1,18 @@
-import { PropsWithChildren, useState } from "react";
+import { PropsWithChildren, useReducer, useState } from "react";
 import { Button } from "~/components/ui/button";
 import { cn } from "~/lib/utils";
 import { AnimatePresence, LayoutGroup } from "framer-motion";
-import { type CardProps, Rank, Suit, ranks, suits } from "~/types/card";
+import { ranks, suits } from "~/types/card";
 import { PlayingCard } from "~/components/playing-card";
+import { cardReducer } from "./cards.util";
 
-const range = (target: number) =>
-  Array.from(Array(target).keys()).map((i) => i + 1);
-
-const rotationClass = (rotation: number) => {
-  return rotation < 0 ? `-${Math.abs(rotation)}deg` : `${rotation}deg`;
-};
+const range = (target: number) => Array.from(Array(target).keys()).map((i) => i + 1);
 
 const rotateConfig = [[0], [-2, 1], [-4, 0, 4], [-5, 0, 5, 10]];
 
 export const CardEditor = () => {
-  const [card, setCard] = useState<CardProps>({ rank: "Ace", suit: "Clubs" });
   const [count, setCount] = useState(1);
-
-  const setRank = (rank: Rank) => setCard({ ...card, rank });
-
-  const setSuit = (suit: Suit) => setCard({ ...card, suit });
+  const [card, dispatch] = useReducer(cardReducer, { rank: "Ace", suit: "Clubs" });
 
   return (
     <>
@@ -30,7 +22,7 @@ export const CardEditor = () => {
           {ranks.map((rank) => (
             <Button
               key={rank}
-              onClick={() => setRank(rank)}
+              onClick={() => dispatch({ type: "rankUpdate", rank })}
               className={cn("leading-3 px-2 py-1", {
                 "border-2 border-solid border-violet-400": rank === card.rank,
               })}
@@ -44,7 +36,7 @@ export const CardEditor = () => {
           {suits.map((suit) => (
             <Button
               key={suit}
-              onClick={() => setSuit(suit)}
+              onClick={() => dispatch({ type: "suitUpdate", suit })}
               className={cn("leading-3 px-2 py-1", {
                 "border-2 border-solid border-violet-400": suit === card.suit,
               })}
@@ -59,6 +51,7 @@ export const CardEditor = () => {
           <AnimatePresence>
             {range(count).map((index, i) => (
               <PlayingCard
+                key={`${card.rank}-${card.suit}-${index}`}
                 card={card}
                 index={index}
                 rotation={rotateConfig[count - 1][i]}
@@ -88,9 +81,7 @@ export const CardEditor = () => {
 };
 
 const Header = ({ children }: PropsWithChildren) => (
-  <h4 className="scroll-m-20 mt-4 text-xl font-semibold tracking-tight">
-    {children}
-  </h4>
+  <h4 className="scroll-m-20 mt-4 text-xl font-semibold tracking-tight">{children}</h4>
 );
 
 export default CardEditor;
