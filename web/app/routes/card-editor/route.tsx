@@ -87,7 +87,7 @@ export const CardEditor = () => {
       <div className="w-1/4 h-full pl-8">
         <Header>Num Cards</Header>
         <div className="pt-2 grid grid-cols-4 gap-1">
-          {range(20).map((i) => (
+          {range(4).map((i) => (
             <Button
               key={i}
               onClick={() => setCount(i)}
