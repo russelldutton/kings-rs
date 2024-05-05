@@ -1,42 +1,39 @@
+import React from "react";
 import { Suit } from "~/types/card";
 
-type SuitIconProps = {
+interface SuitIconProps extends React.SVGProps<SVGSVGElement> {
   suit: Suit;
-  className: string;
-};
+}
 
 const svgContentLookup = {
   Hearts: (
-    <g transform="rotate(45,30,30)">
-      <rect x="15" y="15" height="35" width="35" />
-      <circle cx="15" cy="32.5" r="17.5" />
-      <circle cx="32.5" cy="15" r="17.5" />
-    </g>
+    <path
+      transform="rotate(180, 50, 50)"
+      d="M50,10 A250,250,-45,0,1,20,40 A1,1,-45,0,0,50,75 A1,1,-45,0,0,80,40 A250,250,-45,0,1,50,10"
+      // d="M50,25 A1,1.2,-30,0,0,20,60 L50,90 L80,60 A1,1.2,30,0,0,50,25"
+    ></path>
   ),
   Clubs: (
-    <>
-      <circle cx="18" cy="35" r="14" />
-      <circle cx="30" cy="15" r="14" />
-      <circle cx="42" cy="35" r="14" />
-      <path d="M30,30 Q 30,50 20,60 H40 Q30,50 30,30" />
-    </>
+    <path
+      d="
+          M 33,40
+          A 21 21, 0, 1, 0 50,70
+          Q 50,80 40,90 H60 Q50,80 50,70
+          A 21 21, 0, 1, 0 68,40
+          A 21 21, 0, 1, 0 33,40"
+    />
   ),
-  Diamonds: <rect x="10" y="10" width="40" height="40" transform="rotate(45,30,30)" />,
+  Diamonds: (
+    <path d="M50,10 A200,200,-45,0,1,15,50 A200,200,-45,0,1,50,90 A200,200,-45,0,1,85,50 A200,200,-45,0,1,50,10"></path>
+  ),
   Spades: (
-    <>
-      <g transform="rotate(225,30,30)">
-        <rect width="30" height="30" x="20" y="20" />
-        <circle cx="20" cy="35" r="15" />
-        <circle cx="35" cy="20" r="15" />
-      </g>
-      <path d="M30,30 Q30,50 20,60 H40 Q30,50 30,30" />
-    </>
+    <path d="M50,10 A250,250,-45,0,1,20,40 A1,1,-45,0,0,49,70 A50,50,-45,0,1,40,90 L60,90 A50,50,-45,0,1,51,70 A1,1,-45,0,0,80,40 A250,250,-45,0,1,50,10"></path>
   ),
 } satisfies Record<Suit, JSX.Element>;
 
-export const SuitIcon = ({ suit, className }: SuitIconProps) => {
+export const SuitIcon = ({ suit, ...props }: SuitIconProps) => {
   return (
-    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 60 60" className={className}>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" {...props}>
       {svgContentLookup[suit]}
     </svg>
   );
