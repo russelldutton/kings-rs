@@ -11,7 +11,7 @@ pub async fn create_game_lobby(
     pool: &Pool,
     user_id: i64,
     session_code: String,
-) -> Result<Game, sqlx::Error> {
+) -> Result<Game, AppError> {
     tracing::info!("Creating new game with user id {} as host", user_id);
 
     let new_game = sqlx::query_as!(
@@ -32,7 +32,7 @@ pub async fn create_game_lobby(
     Ok(new_game)
 }
 
-pub async fn get_game_by_id(pool: &Pool, game_id: i64) -> Result<Game, sqlx::Error> {
+pub async fn get_game_by_id(pool: &Pool, game_id: i64) -> Result<Game, AppError> {
     tracing::info!("Looking for game with id: {}", game_id);
 
     let game = sqlx::query_as!(
@@ -51,10 +51,7 @@ pub async fn get_game_by_id(pool: &Pool, game_id: i64) -> Result<Game, sqlx::Err
     Ok(game)
 }
 
-pub async fn get_game_by_session_code(
-    pool: &Pool,
-    session_code: String,
-) -> Result<Game, sqlx::Error> {
+pub async fn get_game_by_session_code(pool: &Pool, session_code: String) -> Result<Game, AppError> {
     tracing::info!("Looking for game with session code: {}", session_code);
 
     let game: Game = sqlx::query_as(

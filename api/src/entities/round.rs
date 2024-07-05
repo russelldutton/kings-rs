@@ -2,7 +2,7 @@ use serde::Serialize;
 
 use crate::models::rank::Rank;
 
-#[derive(Serialize)]
+#[derive(Serialize, Debug)]
 pub struct Round {
     pub id: i64,
     pub rank: Rank,

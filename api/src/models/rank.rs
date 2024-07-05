@@ -1,6 +1,7 @@
 use serde::{Deserialize, Serialize};
+use strum_macros::Display;
 
-#[derive(Serialize, Deserialize, sqlx::Type, PartialEq, Copy, Clone)]
+#[derive(Serialize, Deserialize, sqlx::Type, PartialEq, Copy, Clone, Display, Debug)]
 #[sqlx(type_name = "TEXT", rename_all = "lowercase")]
 pub enum Rank {
     Three,

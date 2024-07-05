@@ -1,6 +1,9 @@
-use crate::{common::app_state::Pool, entities::user::User};
+use crate::{
+    common::{app_error::AppError, app_state::Pool},
+    entities::user::User,
+};
 
-pub async fn register_user(pool: &Pool, nick_name: String) -> Result<User, sqlx::Error> {
+pub async fn register_user(pool: &Pool, nick_name: String) -> Result<User, AppError> {
     tracing::info!("New player with nick_name {}", nick_name);
 
     let new_user: User = sqlx::query_as!(
@@ -15,7 +18,7 @@ pub async fn register_user(pool: &Pool, nick_name: String) -> Result<User, sqlx:
     Ok(new_user)
 }
 
-pub async fn fetch_users(pool: &Pool) -> Result<Vec<User>, sqlx::Error> {
+pub async fn fetch_users(pool: &Pool) -> Result<Vec<User>, AppError> {
     tracing::info!("Fetching all users");
 
     let users = sqlx::query_as!(User, "SELECT * FROM users")

@@ -10,7 +10,8 @@ pub async fn get_players_in_game(pool: &Pool, game_id: i64) -> Result<Vec<Player
     let players = sqlx::query_as!(
         Player,
         r#"
-        SELECT id, user_id, role AS `role?: Role`, game_id AS `game_id?: i64` FROM players
+        SELECT id, user_id, role AS `role?: Role`, game_id AS `game_id?: i64`, turn_ended
+        FROM players
         WHERE game_id = ?
         ORDER BY id ASC
         "#,
@@ -61,11 +62,12 @@ pub async fn create_player_in_game(
     let player = sqlx::query_as!(
         Player,
         r#"
-        INSERT INTO players (user_id, game_id, role) VALUES (?, ?, ?) RETURNING id, user_id, role AS `role?: Role`, game_id
+        INSERT INTO players (user_id, game_id, role, turn_ended) VALUES (?, ?, ?, ?) RETURNING id, user_id, role AS `role?: Role`, game_id, turn_ended
         "#,
         user_id,
         game_id,
-        role
+        role,
+        false
     )
     .fetch_one(pool)
     .await?;
@@ -87,7 +89,7 @@ pub async fn fetch_player_in_game(
 
     let player = sqlx::query_as!(
         Player,
-        "SELECT id, user_id, role as `role: Role`, game_id
+        "SELECT id, user_id, role as `role: Role`, game_id, turn_ended
         FROM players
         WHERE user_id = ? AND game_id = ?",
         user_id,
