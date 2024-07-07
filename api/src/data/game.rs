@@ -84,21 +84,3 @@ pub async fn update_game_status(
     tracing::info!("Successfully updated status.");
     Ok(())
 }
-
-pub async fn get_current_round(pool: &Pool, game_id: i64) -> Result<Option<RoundModel>, AppError> {
-    tracing::info!("Fetching current round for game {}", game_id);
-
-    let round = sqlx::query_as!(
-        Round,
-        "SELECT id, rank AS `rank: Rank`, hand_size, game_id, is_ended
-        FROM rounds
-        WHERE game_id = ?
-        ORDER BY id DESC
-        LIMIT 1",
-        game_id
-    )
-    .fetch_optional(pool)
-    .await?;
-
-    Ok(round.map(|r| r.into()))
-}

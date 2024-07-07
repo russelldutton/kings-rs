@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS players
 (
     id          INTEGER PRIMARY KEY,
     role        TEXT NULL,
+    next_role   TEXT NULL,
     user_id     INTEGER NOT NULL,
     game_id     INTEGER NOT NULL,
     turn_ended  BOOLEAN NOT NULL,
@@ -66,7 +67,6 @@ CREATE TABLE IF NOT EXISTS players_in_round
     player_id   INTEGER NOT NULL,
     round_id    INTEGER NOT NULL,
     is_out      BOOLEAN NOT NULL,
-    next_role   TEXT NULL,
     FOREIGN KEY(player_id) REFERENCES players(id),    
     FOREIGN KEY(round_id) REFERENCES rounds(id)
 );

@@ -2,11 +2,12 @@ use crate::{
     common::{app_error::AppError, app_state::AppState},
     data::{
         card::create_cards_in_game,
-        game::{get_current_round, get_game_by_id, update_game_status},
-        player::{fetch_opponents, fetch_player_cards, fetch_player_in_game, get_players_in_game},
+        game::{get_game_by_id, update_game_status},
+        player::{get_opponents, get_player_cards, get_player_in_game, get_players_in_game},
+        round::{get_current_round, get_round_players, get_round_turns},
     },
     entities::game::GameStatus,
-    models::{game_model::GameModel, player_model::PlayerModel},
+    models::{game_model::GameModel, player_model::PlayerModel, round_model::RoundModel},
     util::{deck::generate_deck, user_session::get_user_id_from_session},
 };
 use axum::{
@@ -81,8 +82,19 @@ pub async fn fetch_game_state(
     Path(game_id): Path<i64>,
 ) -> Result<Json<GameModel>, AppError> {
     let game = get_game_by_id(&state.pool, game_id).await?;
-    let players = fetch_opponents(&state.pool, game_id).await?;
-    let round = get_current_round(&state.pool, game_id).await?;
+    let players = get_opponents(&state.pool, game_id).await?;
+    let maybe_round = get_current_round(&state.pool, game_id).await?;
+    let mut round = if let Some(curr_round) = maybe_round {
+        let turns = get_round_turns(&state.pool, curr_round.id).await?;
+        let players_in_round = get_round_players(&state.pool, curr_round.id).await?;
+
+        let mut round_model: RoundModel = curr_round.into();
+        round_model = round_model.with_turns(turns).with_players(players_in_round);
+
+        Some(round_model)
+    } else {
+        None
+    };
 
     Ok(Json(GameModel {
         id: game_id,
@@ -108,8 +120,8 @@ pub async fn play_turn(
 
     let user_id = get_user_id_from_session(session).await?;
 
-    let player = fetch_player_in_game(&state.pool, game_id, user_id).await?;
-    let cards = fetch_player_cards(&state.pool, player.id).await?;
+    let player = get_player_in_game(&state.pool, game_id, user_id).await?;
+    let cards = get_player_cards(&state.pool, player.id).await?;
     let current_round = get_current_round(&state.pool, game_id).await?;
 
     // Ensure it is player's turn

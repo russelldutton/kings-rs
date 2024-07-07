@@ -10,7 +10,7 @@ pub async fn get_players_in_game(pool: &Pool, game_id: i64) -> Result<Vec<Player
     let players = sqlx::query_as!(
         Player,
         r#"
-        SELECT id, user_id, role AS `role?: Role`, game_id AS `game_id?: i64`, turn_ended
+        SELECT id, user_id, role AS `role?: Role`, next_role AS `next_role?: Role`, game_id AS `game_id?: i64`, turn_ended
         FROM players
         WHERE game_id = ?
         ORDER BY id ASC
@@ -24,7 +24,7 @@ pub async fn get_players_in_game(pool: &Pool, game_id: i64) -> Result<Vec<Player
     Ok(players)
 }
 
-pub async fn fetch_opponents(pool: &Pool, game_id: i64) -> Result<Vec<OpponentModel>, AppError> {
+pub async fn get_opponents(pool: &Pool, game_id: i64) -> Result<Vec<OpponentModel>, AppError> {
     tracing::info!("Fetching list of players in game {}", game_id);
 
     let opponents = sqlx::query_as!(
@@ -62,7 +62,7 @@ pub async fn create_player_in_game(
     let player = sqlx::query_as!(
         Player,
         r#"
-        INSERT INTO players (user_id, game_id, role, turn_ended) VALUES (?, ?, ?, ?) RETURNING id, user_id, role AS `role?: Role`, game_id, turn_ended
+        INSERT INTO players (user_id, game_id, role, turn_ended) VALUES (?, ?, ?, ?) RETURNING id, user_id, role AS `role?: Role`, next_role AS `next_role?: Role`, game_id, turn_ended
         "#,
         user_id,
         game_id,
@@ -76,7 +76,7 @@ pub async fn create_player_in_game(
     Ok(player)
 }
 
-pub async fn fetch_player_in_game(
+pub async fn get_player_in_game(
     pool: &Pool,
     game_id: i64,
     user_id: i64,
@@ -89,7 +89,7 @@ pub async fn fetch_player_in_game(
 
     let player = sqlx::query_as!(
         Player,
-        "SELECT id, user_id, role as `role: Role`, game_id, turn_ended
+        "SELECT id, user_id, role as `role: Role`, next_role AS `next_role?: Role`, game_id, turn_ended
         FROM players
         WHERE user_id = ? AND game_id = ?",
         user_id,
@@ -101,7 +101,7 @@ pub async fn fetch_player_in_game(
     Ok(player)
 }
 
-pub async fn fetch_player_cards(pool: &Pool, player_id: i64) -> Result<Vec<Card>, AppError> {
+pub async fn get_player_cards(pool: &Pool, player_id: i64) -> Result<Vec<Card>, AppError> {
     tracing::info!("Looking for cards for player {}", player_id);
 
     let cards = sqlx::query_as!(

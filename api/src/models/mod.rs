@@ -6,3 +6,4 @@ pub mod rank;
 pub mod role;
 pub mod round_model;
 pub mod suit;
+pub mod turn_model;

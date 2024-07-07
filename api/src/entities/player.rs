@@ -7,6 +7,7 @@ pub struct Player {
     pub id: i64,
     pub user_id: i64,
     pub role: Option<Role>,
+    pub next_role: Option<Role>,
     pub game_id: Option<i64>,
     pub turn_ended: bool,
 }
